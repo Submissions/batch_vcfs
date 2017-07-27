@@ -69,7 +69,7 @@ for raw_line in sys.stdin:  #the excel file is not the std input...?
 workers = []
 max_workers = 2
 python = 'python3'
-script = 'worker.py'
+script = 'bgzip_md5_v2.py'
 
 while work_list or workers:
     while work_list and (len(workers) < max_workers):
@@ -95,7 +95,7 @@ while work_list or workers:
 def start_work_vcf(python, script, vcf_path, dest_dir_path):
     #Return a Popen object#
     subprocess.Popen(['python',
-                      '/hgsc-software/submissions/../../bgzip_md5.py',
+                      'script',
                       '-d',
                       snp_dest_dir_path,
                       s_path],
