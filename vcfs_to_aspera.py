@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-"""TODO: The script imports a yaml ............"""
+"""An automated process to zip, validate, and verify VCFs copied to Aspera"""
 
 import os
 import shlex
@@ -62,7 +62,7 @@ else:
 # Running the compression and checksum script
 
 work_list = deque()
-for raw_line in sys.stdin:
+for raw_line in sys.stdin:  #the excel file is not the std input...?
     a, b = raw_line.rstrip().split()
     work_list.append((a, b))
 
