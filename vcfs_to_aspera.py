@@ -20,11 +20,11 @@ def main():
     run(config)
 
 with open(MY_INPUT_YAML_FILE_NAME) as ymlfile:
-    yam = yaml.load(ymlfile)    
+    yam = yaml.load(ymlfile)
 
 class BatchInfo:
     pass
-    
+
 BI = BatchInfo()
 BI.__dict__.update(yam)
 BI.batch = '{0:02d}'.format(BI.batch)
@@ -34,7 +34,7 @@ BI.source_root = BI.source_root.format_map(vars(BI))
 BI.stage_dir_prefix = BI.stage_dir_prefix.format_map(vars(BI))
 
 if not os.path.exists(BI.source_root):
-    os.mkdir(BI.source_root)   
+    os.mkdir(BI.source_root)
 print(BI.batch)
 print(BI.date)
 print(BI.batch_name)
@@ -48,7 +48,7 @@ XL = BI.xl_name+'.xlsx'
 vcfs = pd.read_csv(XL)
 vcfs.head()
 snp_paths = vcfs['snp_vcf_path']
-indel_paths = vcfs['indel_vcf_path']  
+indel_paths = vcfs['indel_vcf_path']
 
 # Checking the numbers
 NUM_SNP_VCFS = len(snp_paths)
@@ -56,7 +56,7 @@ NUM_INDEL_VCFS = len(indel_paths)
 
 if NUM_SNP_VCFS == NUM_INDEL_VCFS:
     print("equal", NUM_SNP_VCFS)
-else:  
+else:
     print("not equal", NUM_SNP_VCFS, "is not", NUM_INDEL_VCFS, file=sys.stderr)
 
 # Running the compression and checksum script
@@ -106,7 +106,7 @@ def start_work_vcf(python, script, vcf_path, dest_dir_path):
                             stderr=subprocess.PIPE)
     return proc
     
-    
+
 """"
 def start_work_indel(python, script, indel_path, dest_dir_path):
     #Return a Popen object#
