@@ -14,15 +14,22 @@ import pandas as pd
 import yaml
 
 
+DEFAULT_MAX_WORKERS = 2
+
 def main():
     args = parse_args()
     config = load_yaml_config(args.config_file)
+    if args.max_workers is not None:
+        config.max_workers = args.max_workers
+    # TODO: what if user sets to < 1?
     run(config)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('config_file', help='a YAML file')
+    parser.add_argument('-w', '--max_workers', type=int,
+                        help='default {}'.format(DEFAULT_MAX_WORKERS))
     args = parser.parse_args()
     return args
 
@@ -80,7 +87,7 @@ def run(config):
         work_list.append((a, b))
 
     workers = []
-    max_workers = 2
+    max_workers = getattr(config, 'max_workers', DEFAULT_MAX_WORKERS)
     # TODO: Generalize the python3 + worker script concept.
     python = 'python3'
     script = 'bgzip_md5_v2.py'
