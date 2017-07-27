@@ -41,30 +41,30 @@ def load_yaml_config(config_file):
     class BatchInfo:
         pass
 
-    BI = BatchInfo()
-    BI.__dict__.update(yam)
-    BI.batch = '{0:02d}'.format(BI.batch)
-    BI.date = str(BI.date)
-    BI.batch_name = BI.batch_name.format_map(vars(BI))
-    BI.source_root = BI.source_root.format_map(vars(BI))
-    BI.stage_dir_prefix = BI.stage_dir_prefix.format_map(vars(BI))
+    config = BatchInfo()
+    config.__dict__.update(yam)
+    config.batch = '{0:02d}'.format(config.batch)
+    config.date = str(config.date)
+    config.batch_name = config.batch_name.format_map(vars(config))
+    config.source_root = config.source_root.format_map(vars(config))
+    config.stage_dir_prefix = config.stage_dir_prefix.format_map(vars(config))
 
-    if not os.path.exists(BI.source_root):
-        os.mkdir(BI.source_root)
+    if not os.path.exists(config.source_root):
+        os.mkdir(config.source_root)
     # TODO: replace this kind of printing by logging.
-    print(BI.batch)
-    print(BI.date)
-    print(BI.batch_name)
-    print(BI.source_root)
-    return BI
+    print(config.batch)
+    print(config.date)
+    print(config.batch_name)
+    print(config.source_root)
+    return config
 
 
 def run(config):
-    if not os.path.exists(BI.staging_root):
-        os.makedirs(BI.staging_root)
+    if not os.path.exists(config.staging_root):
+        os.makedirs(config.staging_root)
 
     # have to be in the directory with the excel file
-    XL = BI.xl_name+'.xlsx'
+    XL = config.xl_name+'.xlsx'
     vcfs = pd.read_csv(XL)
     vcfs.head()
     snp_paths = vcfs['snp_vcf_path']
