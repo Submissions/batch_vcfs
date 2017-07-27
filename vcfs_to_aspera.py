@@ -3,13 +3,12 @@
 """Batch process a collection of VCF files (SNPs and indels) that are
 listed in an XLSX file which is itself listed in a YAML file."""
 
+from collections import deque
 import os
-import shlex
 import subprocess
 import sys
 import time
 
-from collections import deque
 import pandas as pd
 import yaml
 
