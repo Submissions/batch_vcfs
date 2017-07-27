@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
-"""An automated process to zip, validate, and verify VCFs copied to Aspera"""
+"""Batch process a collection of VCF files (SNPs and indels) that are
+listed in an XLSX file which is itself listed in a YAML file."""
 
 import os
 import shlex
