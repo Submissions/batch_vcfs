@@ -3,6 +3,7 @@
 """Batch process a collection of VCF files (SNPs and indels) that are
 listed in an XLSX file which is itself listed in a YAML file."""
 
+import argparse
 from collections import deque
 import os
 import subprocess
@@ -13,15 +14,21 @@ import pandas as pd
 import yaml
 
 
-MY_INPUT_YAML_FILE_NAME = 'vcf_batch.yml'
-
 def main():
-    config = load_yaml_config()
+    args = parse_args()
+    config = load_yaml_config(args.config_file)
     run(config)
 
 
-def load_yaml_config():
-    with open(MY_INPUT_YAML_FILE_NAME) as ymlfile:
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('config_file', help='a YAML file')
+    args = parser.parse_args()
+    return args
+
+
+def load_yaml_config(config_file):
+    with open(config_file) as ymlfile:
         yam = yaml.load(ymlfile)
 
     class BatchInfo:
