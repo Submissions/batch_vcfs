@@ -44,6 +44,7 @@ def load_yaml_config(config_file):
 
     if not os.path.exists(BI.source_root):
         os.mkdir(BI.source_root)
+    # TODO: replace this kind of printing by logging.
     print(BI.batch)
     print(BI.date)
     print(BI.batch_name)
@@ -80,6 +81,7 @@ def run(config):
 
     workers = []
     max_workers = 2
+    # TODO: Generalize the python3 + worker script concept.
     python = 'python3'
     script = 'bgzip_md5_v2.py'
 
@@ -88,6 +90,7 @@ def run(config):
             work = work_list.popleft()
             a, b = work
             print('starting', a)
+            # TODO: Unify all thi Popen stuff.
             workers.append(
                 subprocess.Popen([python, script, a, b],
                                  stdout=subprocess.DEVNULL,
