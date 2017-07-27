@@ -47,7 +47,10 @@ def load_yaml_config(config_file):
     config.date = str(config.date)
     config.batch_name = config.batch_name.format_map(vars(config))
     config.source_root = config.source_root.format_map(vars(config))
-    config.stage_dir_prefix = config.stage_dir_prefix.format_map(vars(config))
+    stage_dir_prefix = config.stage_dir_prefix.format_map(vars(config))
+    del config.stage_dir_prefix
+    config.snp_dir = stage_dir_prefix + 'SNPs'
+    config.indel_dir = stage_dir_prefix + 'indels'
 
     if not os.path.exists(config.source_root):
         os.mkdir(config.source_root)
@@ -60,8 +63,9 @@ def load_yaml_config(config_file):
 
 
 def run(config):
-    if not os.path.exists(config.staging_root):
-        os.makedirs(config.staging_root)
+    for dir_path in (config.snp_dir, config.indel_dir):
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
 
     # have to be in the directory with the excel file
     XL = config.xl_name+'.xlsx'
