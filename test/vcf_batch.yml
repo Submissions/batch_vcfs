@@ -6,3 +6,7 @@ batch_name: VTE_Mayo_test{batch}_{date}
 source_root: '{batch_name}'
 snp_dir: '{batch_dest_root}/{batch_name}_SNPs'
 indel_dir: '{batch_dest_root}/{batch_name}_indels'
+program_args:
+  - python3
+  - test.py
+  - -d

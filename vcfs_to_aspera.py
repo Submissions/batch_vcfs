@@ -16,7 +16,6 @@ indel_dir: '{batch_dest_root}/{batch_name}_indels'
 """
 
 import argparse
-from collections import deque
 import os
 from pprint import pprint  # TODO: replace by logging later
 import subprocess
@@ -87,8 +86,8 @@ def run(config):
     vcfs.rename(  # The input names are not always consistent.
         columns={'indel_vcf_path': 'indel_path', 'snp_vcf_path': 'snp_path'}
     )
-    snp_paths = vcfs['snp_path']
-    indel_paths = vcfs['indel_path']
+    snp_paths = vcfs.snp_path
+    indel_paths = vcfs.indel_path
 
     # Checking the numbers
     NUM_SNP_VCFS = len(snp_paths)
@@ -98,73 +97,57 @@ def run(config):
         print("equal", NUM_SNP_VCFS)
     else:
         print("not equal", NUM_SNP_VCFS, "is not", NUM_INDEL_VCFS, file=sys.stderr)
-    return  # TODO: remove this as we get the next section of code working
 
-    # Running the compression and checksum script
+    worklist = []  # Pairs of (input file & destination dir)
+    for snp_path in snp_paths:
+        worklist.append((snp_path, config.snp_dir))
+    for indel_path in indel_paths:
+        worklist.append((indel_path, config.indel_dir))
+    pprint(worklist)
 
-    work_list = deque()
-    for raw_line in sys.stdin:  #the excel file is not the std input...?
-        a, b = raw_line.rstrip().split()
-        work_list.append((a, b))
-
-    workers = []
     max_workers = getattr(config, 'max_workers', DEFAULT_MAX_WORKERS)
-    # TODO: Generalize the python3 + worker script concept.
-    python = 'python3'
-    script = 'bgzip_md5_v2.py'
+    # Running the compression and checksum script
+    handle_backlog_with_workers(worklist, config.program_args, max_workers)
 
-    while work_list or workers:
-        while work_list and (len(workers) < max_workers):
-            work = work_list.popleft()
-            a, b = work
-            print('starting', a)
-            # TODO: Unify all thi Popen stuff.
-            workers.append(
-                subprocess.Popen([python, script, a, b],
-                                 stdout=subprocess.DEVNULL,
-                                 stderr=subprocess.DEVNULL)
-            )
+
+def handle_backlog_with_workers(worklist, fixed_args, max_workers):
+    """Run a loop with a maximum number of subprocesses. Consumes"""
+    backlog = worklist[::-1]  # Using pop() will iterate in original order.
+    workers = []
+    while backlog or workers:
+        while backlog and (len(workers) < max_workers):
+            unit_of_work = backlog.pop()
+            vcf_path, dest_dir_path = unit_of_work
+            print('starting', vcf_path)
+            worker = Worker(fixed_args, vcf_path, dest_dir_path)
+            print('started', worker.vcf_name)
+            workers.append(worker)
         for index, worker in enumerate(workers):
-            worker.poll()
-            if worker.returncode is not None:
-                print('finished', index)
-                if worker.returncode:  # nonzero means error
+            worker.proc.poll()
+            if worker.proc.returncode is not None:
+                print('finished', worker.vcf_name)
+                if worker.proc.returncode:  # nonzero means error
                     # Log the error and do whatever.
-                    pass
+                    print('error', worker.vcf_name)
                 del workers[index]
         time.sleep(1)
 
 
-def start_work_vcf(python, script, vcf_path, dest_dir_path):
-    #Return a Popen object#
-    subprocess.Popen(['python',
-                      'script',
-                      '-d',
-                      snp_dest_dir_path,
-                      s_path],
-                     stdout=subprocess.PIPE,
-                     stderr=subprocess.PIPE)
-    proc = subprocess.Popen([python, script, '- d', dest_dir_path, vcf_path],
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-    return proc
+class Worker:
+    """Composite of a subprocess (proc) and an open file (file). The stderr
+    and stdout are combined into that single output file."""
+    def __init__(self, fixed_args, vcf_path, dest_dir_path):
+        os.makedirs(dest_dir_path, exist_ok=True)
+        args = fixed_args + [dest_dir_path, vcf_path]
+        vcf_name = os.path.basename(vcf_path)
+        log_name = vcf_name + '.log'
+        log_path = os.path.join(dest_dir_path, log_name)
+        self.vcf_name = vcf_name
+        self.file = open(log_path, 'wb')
+        self.proc = subprocess.Popen(args,
+                                     stdout=self.file,
+                                     stderr=subprocess.STDOUT)
 
-
-""""
-def start_work_indel(python, script, indel_path, dest_dir_path):
-    #Return a Popen object#
-    subprocess.Popen(['python',
-                      '/hgsc-software/submissions/../../bgzip_md5.py',
-                      '-d',
-                      snp_dest_dir_path,
-                      s_path],
-                     stdout=subprocess.PIPE,
-                     stderr=subprocess.PIPE)
-    proc = subprocess.Popen([python, script, '- d', dest_dir_path, indel_path],
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-    return proc
-"""
 
 if __name__ == '__main__':
     main()
