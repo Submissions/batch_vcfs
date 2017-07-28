@@ -84,7 +84,9 @@ def run(config):
         vcfs = pd.read_excel(config.worklist_file)
     else:
         vcfs = pd.read_table(config.worklist_file)
-    vcfs.head()
+    vcfs.rename(  # The input names are not always consistent.
+        columns={'indel_vcf_path': 'indel_path', 'snp_vcf_path': 'snp_path'}
+    )
     snp_paths = vcfs['snp_path']
     indel_paths = vcfs['indel_path']
 
