@@ -1,7 +1,19 @@
 #! /usr/bin/env python3
 
 """Batch process a collection of VCF files (SNPs and indels) that are
-listed in an XLSX file which is itself listed in a YAML file."""
+listed in an XLSX file which is itself listed in a YAML file.
+
+Sample YAML:
+
+batch: 1
+date: 2017-06-16
+xl_name: vte_mayo_vcfs
+batch_dest_root: '/tmp/testing/aspera/share/submissions/staging/test/one/{batch_name}'
+batch_name: VTE_Mayo_test{batch}_{date}
+source_root: '{batch_name}'
+snp_dir: '{batch_dest_root}/{batch_name}_SNPs'
+indel_dir: '{batch_dest_root}/{batch_name}_indels'
+"""
 
 import argparse
 from collections import deque
