@@ -1,7 +1,8 @@
 batch: 1
 date: 2017-06-16
 xl_name: vte_mayo_vcfs
-staging_root: /aspera/share/submissions/staging/test/one
+batch_dest_root: '/tmp/testing/aspera/share/submissions/staging/test/one/{batch_name}'
 batch_name: VTE_Mayo_test{batch}_{date}
 source_root: '{batch_name}'
-stage_dir_prefix: '{staging_root}/{batch_name}/{batch_name}_'
+snp_dir: '{batch_dest_root}/{batch_name}_SNPs'
+indel_dir: '{batch_dest_root}/{batch_name}_indels'

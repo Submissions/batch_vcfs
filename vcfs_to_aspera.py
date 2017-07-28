@@ -42,15 +42,18 @@ def load_yaml_config(config_file):
         pass
 
     config = BatchInfo()
-    config.__dict__.update(yam)
+    config_dict = config.__dict__
+    config_dict.update(yam)
+    if not config.xl_name.endswith('.xlsx'):
+        config.xl_name = config.xl_name + '.xlsx'
     config.batch = '{0:02d}'.format(config.batch)
     config.date = str(config.date)
-    config.batch_name = config.batch_name.format_map(vars(config))
-    config.source_root = config.source_root.format_map(vars(config))
-    stage_dir_prefix = config.stage_dir_prefix.format_map(vars(config))
-    del config.stage_dir_prefix
-    config.snp_dir = stage_dir_prefix + 'SNPs'
-    config.indel_dir = stage_dir_prefix + 'indels'
+    # TODO: Is there a more elegant way?
+    config.batch_name = config.batch_name.format_map(config_dict)
+    config.source_root = config.source_root.format_map(config_dict)
+    config.batch_dest_root = config.batch_dest_root.format_map(config_dict)
+    config.snp_dir = config.snp_dir.format_map(config_dict)
+    config.indel_dir = config.indel_dir.format_map(config_dict)
 
     if not os.path.exists(config.source_root):
         os.mkdir(config.source_root)
@@ -67,12 +70,12 @@ def run(config):
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    # have to be in the directory with the excel file
-    XL = config.xl_name+'.xlsx'
-    vcfs = pd.read_csv(XL)
+    # TODO: have to be in the directory with the excel file
+    print(repr(config.xl_name))
+    vcfs = pd.read_excel(config.xl_name)
     vcfs.head()
-    snp_paths = vcfs['snp_vcf_path']
-    indel_paths = vcfs['indel_vcf_path']
+    snp_paths = vcfs['snp_path']
+    indel_paths = vcfs['indel_path']
 
     # Checking the numbers
     NUM_SNP_VCFS = len(snp_paths)
