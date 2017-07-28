@@ -18,6 +18,7 @@ indel_dir: '{batch_dest_root}/{batch_name}_indels'
 import argparse
 from collections import deque
 import os
+from pprint import pprint  # TODO: replace by logging later
 import subprocess
 import sys
 import time
@@ -70,10 +71,7 @@ def load_yaml_config(config_file):
     if not os.path.exists(config.source_root):
         os.mkdir(config.source_root)
     # TODO: replace this kind of printing by logging.
-    print(config.batch)
-    print(config.date)
-    print(config.batch_name)
-    print(config.source_root)
+    pprint(config.__dict__)
     return config
 
 
