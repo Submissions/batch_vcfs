@@ -1,6 +1,6 @@
 batch: 1
 date: 2017-06-16
-xl_name: vte_mayo_vcfs
+worklist_file: test.tsv
 batch_dest_root: '/tmp/testing/aspera/share/submissions/staging/test/one/{batch_name}'
 batch_name: VTE_Mayo_test{batch}_{date}
 source_root: '{batch_name}'

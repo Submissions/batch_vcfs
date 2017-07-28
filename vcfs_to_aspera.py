@@ -7,7 +7,7 @@ Sample YAML:
 
 batch: 1
 date: 2017-06-16
-xl_name: vte_mayo_vcfs
+worklist_file: test.tsv
 batch_dest_root: '/tmp/testing/aspera/share/submissions/staging/test/one/{batch_name}'
 batch_name: VTE_Mayo_test{batch}_{date}
 source_root: '{batch_name}'
@@ -57,8 +57,6 @@ def load_yaml_config(config_file):
     config = BatchInfo()
     config_dict = config.__dict__
     config_dict.update(yam)
-    if not config.xl_name.endswith('.xlsx'):
-        config.xl_name = config.xl_name + '.xlsx'
     config.batch = '{0:02d}'.format(config.batch)
     config.date = str(config.date)
     # TODO: Is there a more elegant way?
@@ -81,8 +79,11 @@ def run(config):
             os.makedirs(dir_path)
 
     # TODO: have to be in the directory with the excel file
-    print(repr(config.xl_name))
-    vcfs = pd.read_excel(config.xl_name)
+    print(repr(config.worklist_file))
+    if config.worklist_file.endswith('.xlsx'):
+        vcfs = pd.read_excel(config.worklist_file)
+    else:
+        vcfs = pd.read_table(config.worklist_file)
     vcfs.head()
     snp_paths = vcfs['snp_path']
     indel_paths = vcfs['indel_path']
