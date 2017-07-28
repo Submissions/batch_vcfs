@@ -97,6 +97,7 @@ def run(config):
         print("equal", NUM_SNP_VCFS)
     else:
         print("not equal", NUM_SNP_VCFS, "is not", NUM_INDEL_VCFS, file=sys.stderr)
+    return  # TODO: remove this as we get the next section of code working
 
     # Running the compression and checksum script
 
